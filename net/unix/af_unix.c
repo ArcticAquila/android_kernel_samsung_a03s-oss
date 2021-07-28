@@ -1543,12 +1543,14 @@ static void unix_peek_fds(struct scm_cookie *scm, struct sk_buff *skb)
 	 * pair is to ensure serialization with garbage collection.  It must be
 	 * done between incrementing the file count and installing the file into
 	 * an fd.
+	 *
 	 * If garbage collection starts after the barrier provided by the
 	 * lock/unlock, then it will see the elevated refcount and not mark this
 	 * as a candidate.  If a garbage collection is already in progress
 	 * before the file count was incremented, then the lock/unlock pair will
 	 * ensure that garbage collection is finished before progressing to
 	 * installing the fd.
+	 *
 	 * (*) A -> B where B is on the queue of A or B is on the queue of C
 	 * which is on the queue of listening socket A.
 	 */

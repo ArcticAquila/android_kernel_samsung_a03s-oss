@@ -100,14 +100,17 @@ export CC="$(pwd)/toolchain/clang/host/linux-x86/clang-r383902/bin/clang"
 export KCFLAGS=-w
 export CONFIG_SECTION_MISMATCH_WARN_ONLY=y
 
-threads=$(nproc)
 ram=$(free -h --si | awk '/^Mem:/ {print $2}')
 
 current_user=$(whoami)
 
+start_time=$(date +%s)
+
 if [ "$current_user" = "itzkaguya" ] || [ "$current_user" = "gitpod" ] || [ "$current_user" = "yukiprjkt" ] || [ "$current_user" = "segawa" ] || [ "$current_user" = "nnhra" ] || [ "$current_user" = "rkprstya" ]; then
-    build_command="make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j256"
+    threads=256
+    build_command="make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j$threads"
 else
+    threads=$(nproc)
     build_command="make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j$threads"
 fi
 
@@ -124,14 +127,23 @@ fi
 # Build
 echo ""
 echo "Starting Building"
-echo "Threads : " $threads
+echo "Build Started on $(date '+%A, %d %B %Y') - $(TZ=Asia/Makassar date '+%T %Z')"
+echo "User : $(whoami)"
+echo "Build Threads : " $threads
 echo "RAM : " $ram
 make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y a03s_defconfig
+
+build_start_time=$(date +%s)
 $build_command
+build_end_time=$(date +%s)
+elapsed_time=$((build_end_time - build_start_time))
+build_duration=$(printf '%02d:%02d:%02d' $((elapsed_time / 3600)) $((elapsed_time % 3600 / 60)) $((elapsed_time % 60)))
+
+echo "Build Ended on $(date '+%A, %d %B %Y') - $(TZ=Asia/Makassar date '+%T %Z')"
 
 if [ -e "out/arch/arm64/boot/Image*" ]; then
-    echo "Build Success!"
+    echo "Build Success! Build time elapsed: $build_duration"
     echo "You can check the result in out/arch/arm64/boot/Image*"
 else
-    echo "Build Failed!"
+    echo "Build Failed! Build time elapsed: $build_duration"
 fi

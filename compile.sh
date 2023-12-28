@@ -89,6 +89,10 @@ fi
 export ARCH="arm64"
 export SUBARCH="arm64"
 
+# Export Android Platform flags
+export ANDROID_MAJOR_VERSION=t
+export PLATFORM_VERSION=13
+
 # Export toolchain/clang/llvm flags
 export CROSS_COMPILE="$(pwd)/toolchain/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-androidkernel-"
 export CLANG_TRIPLE="aarch64-linux-gnu-"
@@ -102,10 +106,9 @@ ram=$(free -h --si | awk '/^Mem:/ {print $2}')
 # Build
 echo ""
 echo "Starting Building"
-echo "Threads" $threads
-echo "RAM" $ram
+echo "Threads : " $threads
+echo "RAM : " $ram
 make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y a03s_defconfig
-#make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y menuconfig
 make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j`$threads`
 
 echo "Building done!"

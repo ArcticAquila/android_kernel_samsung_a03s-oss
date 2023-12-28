@@ -138,3 +138,7 @@ toolchain/
 
 # Out directory
 out/
+
+# Other stuff
+kernel-backup/
+

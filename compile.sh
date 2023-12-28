@@ -103,13 +103,21 @@ export CONFIG_SECTION_MISMATCH_WARN_ONLY=y
 threads=$(nproc)
 ram=$(free -h --si | awk '/^Mem:/ {print $2}')
 
+current_user=$(whoami)
+
+if [ "$current_user" = "itzkaguya" ] || [ "$current_user" = "gitpod" ] || [ "$current_user" = "yukiprjkt" ] || [ "$current_user" = "segawa" ] || [ "$current_user" = "nnhra" ] || [ "$current_user" = "rkprstya" ]; then
+    build_command="make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j256"
+else
+    build_command="make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j$threads"
+fi
+
 # Build
 echo ""
 echo "Starting Building"
 echo "Threads : " $threads
 echo "RAM : " $ram
 make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y a03s_defconfig
-make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j`$threads`
+$build_command
 
 echo "Building done!"
 echo "You can check the result in out/arch/arm64/boot/Image "

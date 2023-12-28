@@ -119,5 +119,9 @@ echo "RAM : " $ram
 make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y a03s_defconfig
 $build_command
 
-echo "Building done!"
-echo "You can check the result in out/arch/arm64/boot/Image "
+if [ -e "out/arch/arm64/boot/Image*" ]; then
+    echo "Build Success!"
+    echo "You can check the result in out/arch/arm64/boot/Image*"
+else
+    echo "Build Failed!"
+fi

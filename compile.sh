@@ -131,7 +131,7 @@ echo "Build Started on $(date '+%A, %d %B %Y') - $(TZ=Asia/Makassar date '+%T %Z
 echo "User : $(whoami)"
 echo "Build Threads : " $threads
 echo "RAM : " $ram
-make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y a03s_defconfig
+make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y yukiprjkt_defconfig
 
 build_start_time=$(date +%s)
 $build_command

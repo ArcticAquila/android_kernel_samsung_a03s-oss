@@ -111,6 +111,16 @@ else
     build_command="make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j$threads"
 fi
 
+backup_path="$(pwd)/kernel-backup"
+
+if [ -e "out/arch/arm64/boot/Image*" ]; then
+    echo "Creating backup of entire out/arch/arm64/boot folder"
+    cp -r out/arch/arm64/boot "$backup_path/backup-$(date +'%Y%m%d%H%M%S')"
+
+    echo "Removing existing out/arch/arm64/boot folder after backup"
+    rm -rf out/arch/arm64/boot
+fi
+
 # Build
 echo ""
 echo "Starting Building"

@@ -157,6 +157,7 @@ fi
 echo ""
 echo "Starting Building"
 echo "Build Started on $(date '+%A, %d %B %Y') - $(TZ=Asia/Makassar date '+%T %Z')"
+echo "Defconfig : $defconfig"
 echo "Maintainer : $maintainer"
 echo "User : $(whoami)"
 echo "Build Threads : $threads"

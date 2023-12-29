@@ -145,7 +145,7 @@ fi
 
 backup_path="$(pwd)/kernel-backup"
 
-if [ -e "out/arch/arm64/boot/Image*" ]; then
+if [ -e "out/arch/arm64/boot/Image.gz" ]; then
     echo "Creating backup of entire out/arch/arm64/boot folder"
     cp -r out/arch/arm64/boot "$backup_path/backup-$(date +'%Y%m%d%H%M%S')"
 
@@ -171,9 +171,9 @@ build_duration=$(printf '%02d:%02d:%02d' $((elapsed_time / 3600)) $((elapsed_tim
 
 echo "Build Ended on $(date '+%A, %d %B %Y') - $(TZ=Asia/Makassar date '+%T %Z')"
 
-if [ -e "out/arch/arm64/boot/Image*" ]; then
+if [ -e "out/arch/arm64/boot/Image.gz" ]; then
     echo "Build Success! Build time elapsed: $build_duration"
-    echo "You can check the result in out/arch/arm64/boot/Image*"
+    echo "You can check the result in out/arch/arm64/boot/"
 
     anykernel_path="out/AnyKernel3"
 
@@ -207,6 +207,7 @@ if [ -e "out/arch/arm64/boot/Image*" ]; then
 
     echo "AnyKernel3 script updated for $device_name (${codename_array[0]}) maintained by $maintainer."
     echo "Zip file created: $release_path/$zip_name"
+    echo "Flashable zip file created! Check the results on out/kernel-release/"
 else
     echo "Build Failed! Build time elapsed: $build_duration"
 fi

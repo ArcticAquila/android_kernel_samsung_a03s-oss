@@ -147,6 +147,7 @@ backup_path="$(pwd)/kernel-backup"
 
 if [ -e "out/arch/arm64/boot/Image.gz" ]; then
     echo "Creating backup of entire out/arch/arm64/boot folder"
+    mkdir -p "$backup_path"
     cp -r out/arch/arm64/boot "$backup_path/backup-$(date +'%Y%m%d%H%M%S')"
 
     echo "Removing existing out/arch/arm64/boot folder after backup"
@@ -179,6 +180,7 @@ if [ -e "out/arch/arm64/boot/Image.gz" ]; then
     anykernel_path="$(pwd)/out/AnyKernel3"
 
     echo "Cloning AnyKernel3 repository"
+    rm -rf "$anykernel_path"
     git clone https://github.com/nnhra/ItzKaguya-AnyKernel3 "$anykernel_path"
 
     anykernel_script="$anykernel_path/anykernel.sh"
@@ -201,7 +203,7 @@ if [ -e "out/arch/arm64/boot/Image.gz" ]; then
 
     release_path="$(pwd)/out/kernel-release/$(date +'%Y%m%d%H%M%S')"
     mkdir -p "$release_path"
-    mv "$zip_name" "$release_path"
+    mv "$anykernel_path/$zip_name" "$release_path"
 
     echo "Restoring AnyKernel3 repository"
     cd "$anykernel_path"

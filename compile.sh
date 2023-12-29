@@ -1,5 +1,45 @@
 #!/bin/bash
 
+# Ask the user for Device Name, Codename, and Maintainer for the kernel
+echo "Enter Device Name for the kernel:"
+read device_name
+
+echo "Enter Codename(s) for the kernel (up to 5, separate by comma if more than one):"
+read codenames
+
+# Convert comma-separated codenames to an array
+IFS=',' read -ra codename_array <<< "$codenames"
+
+# Ensure there are at most 5 codenames
+codename_count=${#codename_array[@]}
+if [ "$codename_count" -gt 5 ]; then
+    echo "Error: You can only provide up to 5 codenames for the kernel."
+    exit 1
+fi
+
+echo "Enter Maintainer for the kernel:"
+read maintainer
+
+# Ask the user for Device Name, Codename, and Maintainer for AnyKernel3
+echo "Enter Device Name:"
+read device_name_ak3
+
+echo "Enter Codename(s) (up to 5, separate by comma if more than one):"
+read codenames_ak3
+
+# Convert comma-separated codenames to an array
+IFS=',' read -ra codename_array_ak3 <<< "$codenames_ak3"
+
+# Ensure there are at most 5 codenames
+codename_count_ak3=${#codename_array_ak3[@]}
+if [ "$codename_count_ak3" -gt 5 ]; then
+    echo "Error: You can only provide up to 5 codenames."
+    exit 1
+fi
+
+echo "Enter Maintainer:"
+read maintainer_ak3
+
 # Get the system's architecture
 arch=$(uname -m)
 
@@ -100,18 +140,27 @@ export CC="$(pwd)/toolchain/clang/host/linux-x86/clang-r383902/bin/clang"
 export KCFLAGS=-w
 export CONFIG_SECTION_MISMATCH_WARN_ONLY=y
 
+echo "List of available defconfigs:"
+ls arch/$ARCH/configs
+
+echo "Enter the defconfig you want to use (default: yukiprjkt_defconfig):"
+read chosen_defconfig
+
+defconfig=${chosen_defconfig:-yukiprjkt_defconfig}
+
 ram=$(free -h --si | awk '/^Mem:/ {print $2}')
 
 current_user=$(whoami)
 
 start_time=$(date +%s)
 
-if [ "$current_user" = "itzkaguya" ] || [ "$current_user" = "gitpod" ] || [ "$current_user" = "yukiprjkt" ] || [ "$current_user" = "segawa" ] || [ "$current_user" = "nnhra" ] || [ "$current_user" = "rkprstya" ]; then
-    threads=256
-    build_command="make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j$threads"
+threads=$(nproc)
+build_command="make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j$threads"
+
+if [ "$maintainer" = "ItzKaguya" ]; then
+    zip_name="ItzKaguya-Kernel-$device_name-${codename_array[0]}.zip"
 else
-    threads=$(nproc)
-    build_command="make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j$threads"
+    zip_name="ItzKaguya-Kernel-$device_name-${codename_array[0]}-$maintainer.zip"
 fi
 
 backup_path="$(pwd)/kernel-backup"
@@ -128,10 +177,11 @@ fi
 echo ""
 echo "Starting Building"
 echo "Build Started on $(date '+%A, %d %B %Y') - $(TZ=Asia/Makassar date '+%T %Z')"
+echo "Maintainer : $maintainer"
 echo "User : $(whoami)"
-echo "Build Threads : " $threads
-echo "RAM : " $ram
-make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y yukiprjkt_defconfig
+echo "Build Threads : $threads"
+echo "RAM : $ram"
+make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y $defconfig
 
 build_start_time=$(date +%s)
 $build_command
@@ -144,6 +194,39 @@ echo "Build Ended on $(date '+%A, %d %B %Y') - $(TZ=Asia/Makassar date '+%T %Z')
 if [ -e "out/arch/arm64/boot/Image*" ]; then
     echo "Build Success! Build time elapsed: $build_duration"
     echo "You can check the result in out/arch/arm64/boot/Image*"
+
+    anykernel_path="out/AnyKernel3"
+
+    echo "Cloning AnyKernel3 repository"
+    git clone https://github.com/nnhra/ItzKaguya-AnyKernel3 "$anykernel_path"
+
+    anykernel_script="$anykernel_path/anykernel.sh"
+
+    sed -i "s/kernel\.string=.*/kernel.string=ItzKaguya Kernel for $device_name/" "$anykernel_script"
+
+    for i in "${!codename_array[@]}"; do
+        index=$((i + 1))
+        sed -i "s/device\.name$index=.*/device.name$index=${codename_array[i]}/" "$anykernel_script"
+    done
+
+    for i in $(seq $((codename_count + 1)) 5); do
+        sed -i "s/device\.name$i=.*/device.name$i=/" "$anykernel_script"
+    done
+
+    cd "$anykernel_path"
+
+    zip -0 -r "$zip_name" *
+
+    release_path="out/kernel-release/$(date +'%Y%m%d%H%M%S')"
+    mkdir -p "$release_path"
+    mv "$zip_name" "$release_path"
+
+    echo "Restoring AnyKernel3 repository"
+    cd "$anykernel_path"
+    git restore anykernel.sh
+
+    echo "AnyKernel3 script updated for $device_name (${codename_array[0]}) maintained by $maintainer."
+    echo "Zip file created: $release_path/$zip_name"
 else
     echo "Build Failed! Build time elapsed: $build_duration"
 fi

@@ -20,26 +20,6 @@ fi
 echo "Enter Maintainer for the kernel:"
 read maintainer
 
-# Ask the user for Device Name, Codename, and Maintainer for AnyKernel3
-echo "Enter Device Name:"
-read device_name_ak3
-
-echo "Enter Codename(s) (up to 5, separate by comma if more than one):"
-read codenames_ak3
-
-# Convert comma-separated codenames to an array
-IFS=',' read -ra codename_array_ak3 <<< "$codenames_ak3"
-
-# Ensure there are at most 5 codenames
-codename_count_ak3=${#codename_array_ak3[@]}
-if [ "$codename_count_ak3" -gt 5 ]; then
-    echo "Error: You can only provide up to 5 codenames."
-    exit 1
-fi
-
-echo "Enter Maintainer:"
-read maintainer_ak3
-
 # Get the system's architecture
 arch=$(uname -m)
 

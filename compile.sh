@@ -138,9 +138,9 @@ threads=$(nproc)
 build_command="make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y -j$threads"
 
 if [ "$maintainer" = "ItzKaguya" ]; then
-    zip_name="ItzKaguya-Kernel-$device_name-${codename_array[0]}.zip"
+    zip_name="ItzKaguya-Kernel-${codename_array[0]}.zip"
 else
-    zip_name="ItzKaguya-Kernel-$device_name-${codename_array[0]}-$maintainer.zip"
+    zip_name="ItzKaguya-Kernel-${codename_array[0]}-$maintainer.zip"
 fi
 
 backup_path="$(pwd)/kernel-backup"
@@ -175,7 +175,7 @@ if [ -e "out/arch/arm64/boot/Image.gz" ]; then
     echo "Build Success! Build time elapsed: $build_duration"
     echo "You can check the result in out/arch/arm64/boot/"
 
-    anykernel_path="out/AnyKernel3"
+    anykernel_path="$(pwd)/out/AnyKernel3"
 
     echo "Cloning AnyKernel3 repository"
     git clone https://github.com/nnhra/ItzKaguya-AnyKernel3 "$anykernel_path"

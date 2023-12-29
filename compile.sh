@@ -109,6 +109,10 @@ fi
 export ARCH="arm64"
 export SUBARCH="arm64"
 
+# User config
+export KBUILD_BUILD_USER=ItzKaguya
+export KBUILD_BUILD_HOST=ItzKaguya-PC
+
 # Export Android Platform flags
 export ANDROID_MAJOR_VERSION=t
 export PLATFORM_VERSION=13

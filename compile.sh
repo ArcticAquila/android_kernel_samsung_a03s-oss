@@ -196,6 +196,7 @@ if [ -e "out/arch/arm64/boot/Image.gz" ]; then
     cd "$anykernel_path"
 
     zip -0 -r "$zip_name" *
+    cd ../..
 
     release_path="$(pwd)/out/kernel-release/$(date +'%Y%m%d%H%M%S')"
     mkdir -p "$release_path"

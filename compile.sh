@@ -64,7 +64,7 @@ if ! command_exists flex || ! command_exists bc; then
 
   # Install packages based on the detected distribution
   case $distro in
-    debian|ubuntu)
+    debian|ubuntu|Ubuntu)
       install_debian_packages
       ;;
     fedora|centos|rhel)
